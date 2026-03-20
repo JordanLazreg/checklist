@@ -21,7 +21,7 @@
             width: 210mm;
             height: 297mm;
             background-color: white;
-            padding: 10mm; /* Marges réduites pour éviter le débordement */
+            padding: 10mm;
             box-shadow: 0 0 10px rgba(0,0,0,0.5);
             position: relative;
             overflow: hidden;
@@ -46,18 +46,17 @@
         }
         .input-blue:focus { background-color: #cce0ff; border-bottom: 1px solid #0056b3; }
 
-        /* Tableaux de Checklists - CORRECTION OVERFLOW */
+        /* Tableaux de Checklists */
         table.checklist {
             width: 100%;
             border-collapse: collapse;
             font-size: 7.5pt;
             margin-bottom: 10px;
-            table-layout: fixed; /* Règle d'or pour empêcher le chevauchement */
+            table-layout: fixed;
         }
         
         table.checklist th { text-align: center; font-weight: normal; font-size: 7.5pt; padding-bottom: 5px; }
         
-        /* Répartition mathématique des largeurs de colonnes */
         .col-label { width: 38%; text-align: left; font-weight: bold; font-size: 8.5pt; }
         .col-check { width: 7%; text-align: center; }
         .col-obs { width: 41%; text-align: left; padding-left: 5px; }
@@ -127,10 +126,26 @@
         .btn-reset { background-color: #d9534f; }
         .btn-reset:hover { background-color: #c9302c; }
 
-        /* Impression */
+        /* ================= IMPRESSION (CORRIGÉ) ================= */
+        @page {
+            size: A4;
+            margin: 0; /* Écrase les marges par défaut du navigateur */
+        }
+
         @media print {
-            body { background: white; padding: 0; gap: 0; }
-            .page { box-shadow: none; padding: 10mm; margin: 0; height: 297mm; page-break-after: always; }
+            body { background: white; padding: 0; margin: 0; gap: 0; }
+            .page { 
+                box-shadow: none; 
+                padding: 10mm; 
+                margin: 0; 
+                width: 210mm;
+                height: 297mm; 
+                page-break-after: always; 
+                page-break-inside: avoid;
+            }
+            .page:last-child {
+                page-break-after: auto; /* Empêche l'apparition d'une 5ème page blanche à la fin */
+            }
             .input-blue, .obs-input-row { background-color: transparent !important; border: none !important; border-bottom: 1px dotted #000 !important; }
             .actions-panel { display: none !important; }
             -webkit-print-color-adjust: exact;
@@ -397,10 +412,9 @@
     <script>
         const allInputs = document.querySelectorAll('input, textarea');
         
-        // J'ai modifié la clé en v5 pour être sûr que ça ne se mélange pas avec d'anciennes sauvegardes buggées
         allInputs.forEach(input => {
             if (!input.id) return;
-            const savedData = localStorage.getItem('man-ct-v5-' + input.id);
+            const savedData = localStorage.getItem('man-ct-v6-' + input.id);
             if (savedData !== null) {
                 if (input.type === 'checkbox') input.checked = savedData === 'true';
                 else input.value = savedData;
@@ -408,7 +422,7 @@
             
             input.addEventListener('input', () => {
                 const valueToSave = input.type === 'checkbox' ? input.checked : input.value;
-                localStorage.setItem('man-ct-v5-' + input.id, valueToSave);
+                localStorage.setItem('man-ct-v6-' + input.id, valueToSave);
             });
         });
 
@@ -417,7 +431,7 @@
                 allInputs.forEach(input => {
                     if (input.type === 'checkbox') input.checked = false;
                     else input.value = '';
-                    localStorage.removeItem('man-ct-v5-' + input.id);
+                    localStorage.removeItem('man-ct-v6-' + input.id);
                 });
             }
         }
