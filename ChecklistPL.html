@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Évaluation Avant Passage aux Mines - MAN</title>
+    <style>
+        * { box-sizing: border-box; font-family: Arial, sans-serif; }
+        
+        body {
+            background-color: #555;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+            gap: 20px;
+        }
+
+        .page {
+            width: 210mm;
+            height: 297mm;
+            background-color: white;
+            padding: 15mm;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* En-tête Page 1 */
+        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+        .title { font-size: 14pt; font-weight: bold; text-decoration: underline; margin-bottom: 5px; }
+        
+        .info-block { width: 100%; display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .info-client { width: 45%; }
+        .info-table { width: 50%; border-collapse: collapse; }
+        .info-table td { padding: 2px 5px; font-size: 9pt; }
+        .input-blue {
+            width: 100%;
+            background-color: #e6f0ff;
+            border: none;
+            padding: 4px;
+            font-size: 9pt;
+            outline: none;
+        }
+        .input-blue:focus { background-color: #cce0ff; border-bottom: 1px solid #0056b3; }
+
+        /* Tableaux de Checklists */
+        table.checklist {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8.5pt;
+            margin-bottom: 10px;
+        }
+        table.checklist th { text-align: center; font-weight: normal; font-size: 8pt; padding-bottom: 5px; }
+        table.checklist th:first-child { text-align: left; font-weight: bold; font-size: 10pt; width: 45%; }
+        table.checklist td { padding: 2px 0; vertical-align: middle; border-bottom: 1px solid #f0f0f0; }
+        
+        .col-check { width: 5%; text-align: center; }
+        .col-obs { width: 40%; }
+        
+        .section-title { font-weight: bold; padding-top: 10px !important; padding-bottom: 5px !important; border-bottom: none !important; }
+        
+        /* Nouveau style pour les observations par ligne */
+        .obs-input-row {
+            width: 100%;
+            background-color: #e6f0ff;
+            border: 1px solid #fff;
+            padding: 3px;
+            font-size: 8pt;
+            outline: none;
+            box-sizing: border-box;
+        }
+        .obs-input-row:focus { background-color: #cce0ff; border-bottom: 1px solid #0056b3; }
+        
+        input[type="checkbox"] { cursor: pointer; }
+
+        /* Tableaux des Annexes (Page 4) */
+        table.annexe-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8.5pt;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        table.annexe-table th, table.annexe-table td {
+            border: 1px solid #000;
+            padding: 5px;
+        }
+        table.annexe-table th { background-color: #f0f0f0; font-weight: bold; }
+        .annexe-title { font-weight: bold; font-size: 10pt; margin-top: 15px; margin-bottom: 5px; }
+
+        /* Blocs spécifiques Page 3 */
+        .signature-block {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Pied de page */
+        .footer {
+            position: absolute;
+            bottom: 10mm;
+            left: 15mm;
+            right: 15mm;
+            display: flex;
+            justify-content: space-between;
+            font-size: 7pt;
+        }
+
+        /* BOUTON D'ACTION FLOTTANT */
+        .actions-panel {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+        .btn {
+            padding: 15px 25px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 14pt;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: background-color 0.2s;
+        }
+        .btn-pdf { background-color: #005b82; }
+        .btn-pdf:hover { background-color: #003f5c; }
+        .btn-reset { background-color: #d9534f; font-size: 12pt; padding: 15px; }
+        .btn-reset:hover { background-color: #c9302c; }
+
+        /* Impression */
+        @media print {
+            body { background: white; padding: 0; gap: 0; }
+            .page { box-shadow: none; padding: 0; margin: 0; height: 297mm; page-break-after: always; }
+            .input-blue, .obs-input-row { background-color: transparent !important; border-bottom: 1px dotted #000; border-left: none; border-right: none; border-top: none; }
+            .actions-panel { display: none !important; }
+            -webkit-print-color-adjust: exact;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="actions-panel">
+        <button class="btn btn-reset" onclick="resetForm()">Nouveau rapport</button>
+        <button class="btn btn-pdf" onclick="window.print()">Générer rapport PDF</button>
+    </div>
+
+    <div class="page">
+        <div class="header">
+            <div>
+                <div class="title">Évaluation avant passage aux Mines</div>
+                <div style="font-size: 9pt;">Client</div>
+                <input type="text" id="p1_client" class="input-blue" style="width: 300px; margin-top: 5px;">
+            </div>
+            <div>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/e/ea/MAN_Truck_%26_Bus_logo.svg" alt="MAN Logo" style="height: 60px;">
+            </div>
+        </div>
+
+        <div class="info-block">
+            <div class="info-client"></div>
+            <table class="info-table">
+                <tr><td>Immatriculation</td><td><input type="text" id="p1_immat" class="input-blue"></td></tr>
+                <tr><td>Type</td><td><input type="text" id="p1_type" class="input-blue"></td></tr>
+                <tr><td>N° d' O.R.</td><td><input type="text" id="p1_or" class="input-blue"></td></tr>
+                <tr><td>Kilométrage</td><td><input type="text" id="p1_km" class="input-blue"></td></tr>
+            </table>
+        </div>
+
+        <table class="checklist">
+            <thead>
+                <tr>
+                    <th>CONTRÔLE DE L'EFFICACITE</th>
+                    <th class="col-check">correct</th><th class="col-check">incorrect</th><th class="col-check">suppr.<br>défaut</th>
+                    <th class="col-obs" style="text-align: left; padding-left: 5px;">Observations :</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td class="section-title" colspan="5">Éclairage</td></tr>
+                <tr><td>Veilleuse droite et gauche</td><td class="col-check"><input type="checkbox" id="p1_e1_c"></td><td class="col-check"><input type="checkbox" id="p1_e1_i"></td><td class="col-check"><input type="checkbox" id="p1_e1_s"></td><td class="col-obs"><input type="text" id="p1_e1_o" class="obs-input-row"></td></tr>
+                <tr><td>Éclairage des plaques</td><td class="col-check"><input type="checkbox" id="p1_e2_c"></td><td class="col-check"><input type="checkbox" id="p1_e2_i"></td><td class="col-check"><input type="checkbox" id="p1_e2_s"></td><td class="col-obs"><input type="text" id="p1_e2_o" class="obs-input-row"></td></tr>
+                <tr><td>Clignotants D et G + témoin</td><td class="col-check"><input type="checkbox" id="p1_e3_c"></td><td class="col-check"><input type="checkbox" id="p1_e3_i"></td><td class="col-check"><input type="checkbox" id="p1_e3_s"></td><td class="col-obs"><input type="text" id="p1_e3_o" class="obs-input-row"></td></tr>
+                <tr><td>Warning + témoin</td><td class="col-check"><input type="checkbox" id="p1_e4_c"></td><td class="col-check"><input type="checkbox" id="p1_e4_i"></td><td class="col-check"><input type="checkbox" id="p1_e4_s"></td><td class="col-obs"><input type="text" id="p1_e4_o" class="obs-input-row"></td></tr>
+                <tr><td>Feux stop D et G</td><td class="col-check"><input type="checkbox" id="p1_e5_c"></td><td class="col-check"><input type="checkbox" id="p1_e5_i"></td><td class="col-check"><input type="checkbox" id="p1_e5_s"></td><td class="col-obs"><input type="text" id="p1_e5_o" class="obs-input-row"></td></tr>
+                <tr><td>Codes D et G (voir annexe 1)</td><td class="col-check"><input type="checkbox" id="p1_e6_c"></td><td class="col-check"><input type="checkbox" id="p1_e6_i"></td><td class="col-check"><input type="checkbox" id="p1_e6_s"></td><td class="col-obs"><input type="text" id="p1_e6_o" class="obs-input-row"></td></tr>
+                <tr><td>Phare D et G + Témoin</td><td class="col-check"><input type="checkbox" id="p1_e7_c"></td><td class="col-check"><input type="checkbox" id="p1_e7_i"></td><td class="col-check"><input type="checkbox" id="p1_e7_s"></td><td class="col-obs"><input type="text" id="p1_e7_o" class="obs-input-row"></td></tr>
+                <tr><td>État des optiques et cabochons</td><td class="col-check"><input type="checkbox" id="p1_e8_c"></td><td class="col-check"><input type="checkbox" id="p1_e8_i"></td><td class="col-check"><input type="checkbox" id="p1_e8_s"></td><td class="col-obs"><input type="text" id="p1_e8_o" class="obs-input-row"></td></tr>
+                <tr><td>Éclairage intérieur de la cabine</td><td class="col-check"><input type="checkbox" id="p1_e9_c"></td><td class="col-check"><input type="checkbox" id="p1_e9_i"></td><td class="col-check"><input type="checkbox" id="p1_e9_s"></td><td class="col-obs"><input type="text" id="p1_e9_o" class="obs-input-row"></td></tr>
+                <tr><td>Témoin frein de parc</td><td class="col-check"><input type="checkbox" id="p1_e10_c"></td><td class="col-check"><input type="checkbox" id="p1_e10_i"></td><td class="col-check"><input type="checkbox" id="p1_e10_s"></td><td class="col-obs"><input type="text" id="p1_e10_o" class="obs-input-row"></td></tr>
+                <tr><td>Antibrouillard avant (voir annexe 2)</td><td class="col-check"><input type="checkbox" id="p1_e11_c"></td><td class="col-check"><input type="checkbox" id="p1_e11_i"></td><td class="col-check"><input type="checkbox" id="p1_e11_s"></td><td class="col-obs"><input type="text" id="p1_e11_o" class="obs-input-row"></td></tr>
+                <tr><td>Antibrouillard arrière (voir annexe 2)</td><td class="col-check"><input type="checkbox" id="p1_e12_c"></td><td class="col-check"><input type="checkbox" id="p1_e12_i"></td><td class="col-check"><input type="checkbox" id="p1_e12_s"></td><td class="col-obs"><input type="text" id="p1_e12_o" class="obs-input-row"></td></tr>
+
+                <tr><td class="section-title" colspan="5">Signalisation</td></tr>
+                <tr><td>Plaques minéralogiques AV et AR / Plaques réflecto AR</td><td class="col-check"><input type="checkbox" id="p1_s1_c"></td><td class="col-check"><input type="checkbox" id="p1_s1_i"></td><td class="col-check"><input type="checkbox" id="p1_s1_s"></td><td class="col-obs"><input type="text" id="p1_s1_o" class="obs-input-row"></td></tr>
+                <tr><td>Catadioptres rouges AR</td><td class="col-check"><input type="checkbox" id="p1_s2_c"></td><td class="col-check"><input type="checkbox" id="p1_s2_i"></td><td class="col-check"><input type="checkbox" id="p1_s2_s"></td><td class="col-obs"><input type="text" id="p1_s2_o" class="obs-input-row"></td></tr>
+                <tr><td>Catadioptres jaunes latéraux</td><td class="col-check"><input type="checkbox" id="p1_s3_c"></td><td class="col-check"><input type="checkbox" id="p1_s3_i"></td><td class="col-check"><input type="checkbox" id="p1_s3_s"></td><td class="col-obs"><input type="text" id="p1_s3_o" class="obs-input-row"></td></tr>
+                <tr><td>Disque limitation de vitesse autorisée</td><td class="col-check"><input type="checkbox" id="p1_s4_c"></td><td class="col-check"><input type="checkbox" id="p1_s4_i"></td><td class="col-check"><input type="checkbox" id="p1_s4_s"></td><td class="col-obs"><input type="text" id="p1_s4_o" class="obs-input-row"></td></tr>
+                <tr><td>Plaque de tare</td><td class="col-check"><input type="checkbox" id="p1_s5_c"></td><td class="col-check"><input type="checkbox" id="p1_s5_i"></td><td class="col-check"><input type="checkbox" id="p1_s5_s"></td><td class="col-obs"><input type="text" id="p1_s5_o" class="obs-input-row"></td></tr>
+                <tr><td>Klaxon route ville</td><td class="col-check"><input type="checkbox" id="p1_s6_c"></td><td class="col-check"><input type="checkbox" id="p1_s6_i"></td><td class="col-check"><input type="checkbox" id="p1_s6_s"></td><td class="col-obs"><input type="text" id="p1_s6_o" class="obs-input-row"></td></tr>
+                <tr><td>Triangle + Extincteur</td><td class="col-check"><input type="checkbox" id="p1_s7_c"></td><td class="col-check"><input type="checkbox" id="p1_s7_i"></td><td class="col-check"><input type="checkbox" id="p1_s7_s"></td><td class="col-obs"><input type="text" id="p1_s7_o" class="obs-input-row"></td></tr>
+                <tr><td>Réglage des phares + antibrouillards / Bip de recul</td><td class="col-check"><input type="checkbox" id="p1_s8_c"></td><td class="col-check"><input type="checkbox" id="p1_s8_i"></td><td class="col-check"><input type="checkbox" id="p1_s8_s"></td><td class="col-obs"><input type="text" id="p1_s8_o" class="obs-input-row"></td></tr>
+
+                <tr><td class="section-title" colspan="5">Freinage</td></tr>
+                <tr><td>Banc d'essai - Essai routier (voir annexe 3)</td><td class="col-check"><input type="checkbox" id="p1_f1_c"></td><td class="col-check"><input type="checkbox" id="p1_f1_i"></td><td class="col-check"><input type="checkbox" id="p1_f1_s"></td><td class="col-obs"><input type="text" id="p1_f1_o" class="obs-input-row"></td></tr>
+                <tr><td>Contrôles visuels (voir CL.03.10)</td><td class="col-check"><input type="checkbox" id="p1_f2_c"></td><td class="col-check"><input type="checkbox" id="p1_f2_i"></td><td class="col-check"><input type="checkbox" id="p1_f2_s"></td><td class="col-obs"><input type="text" id="p1_f2_o" class="obs-input-row"></td></tr>
+                <tr><td>Contrôle de l'indépendance des circuits</td><td class="col-check"><input type="checkbox" id="p1_f3_c"></td><td class="col-check"><input type="checkbox" id="p1_f3_i"></td><td class="col-check"><input type="checkbox" id="p1_f3_s"></td><td class="col-obs"><input type="text" id="p1_f3_o" class="obs-input-row"></td></tr>
+                <tr><td>Contrôle du correcteur / Épuisabilité du circuit</td><td class="col-check"><input type="checkbox" id="p1_f4_c"></td><td class="col-check"><input type="checkbox" id="p1_f4_i"></td><td class="col-check"><input type="checkbox" id="p1_f4_s"></td><td class="col-obs"><input type="text" id="p1_f4_o" class="obs-input-row"></td></tr>
+
+                <tr><td class="section-title" colspan="5">Direction</td></tr>
+                <tr><td>Jeu de colonne de direction</td><td class="col-check"><input type="checkbox" id="p1_d1_c"></td><td class="col-check"><input type="checkbox" id="p1_d1_i"></td><td class="col-check"><input type="checkbox" id="p1_d1_s"></td><td class="col-obs"><input type="text" id="p1_d1_o" class="obs-input-row"></td></tr>
+                <tr><td>Jeu du boîtier de direction</td><td class="col-check"><input type="checkbox" id="p1_d2_c"></td><td class="col-check"><input type="checkbox" id="p1_d2_i"></td><td class="col-check"><input type="checkbox" id="p1_d2_s"></td><td class="col-obs"><input type="text" id="p1_d2_o" class="obs-input-row"></td></tr>
+                <tr><td>Étanchéité boîtier de direction</td><td class="col-check"><input type="checkbox" id="p1_d3_c"></td><td class="col-check"><input type="checkbox" id="p1_d3_i"></td><td class="col-check"><input type="checkbox" id="p1_d3_s"></td><td class="col-obs"><input type="text" id="p1_d3_o" class="obs-input-row"></td></tr>
+                <tr><td>Jeu de rotules de direction</td><td class="col-check"><input type="checkbox" id="p1_d4_c"></td><td class="col-check"><input type="checkbox" id="p1_d4_i"></td><td class="col-check"><input type="checkbox" id="p1_d4_s"></td><td class="col-obs"><input type="text" id="p1_d4_o" class="obs-input-row"></td></tr>
+                <tr><td>Jeu des pivots / Jeu des moyeux</td><td class="col-check"><input type="checkbox" id="p1_d5_c"></td><td class="col-check"><input type="checkbox" id="p1_d5_i"></td><td class="col-check"><input type="checkbox" id="p1_d5_s"></td><td class="col-obs"><input type="text" id="p1_d5_o" class="obs-input-row"></td></tr>
+                <tr><td>État de la barre d'accouplement</td><td class="col-check"><input type="checkbox" id="p1_d6_c"></td><td class="col-check"><input type="checkbox" id="p1_d6_i"></td><td class="col-check"><input type="checkbox" id="p1_d6_s"></td><td class="col-obs"><input type="text" id="p1_d6_o" class="obs-input-row"></td></tr>
+            </tbody>
+        </table>
+
+        <div class="footer">
+            <span>CL.04.04</span>
+            <span>MAN Truck and Bus France</span>
+            <span>p. 1/4</span>
+        </div>
+    </div>
+
+    <div class="page">
+        <table class="checklist">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th class="col-check">correct</th><th class="col-check">incorrect</th><th class="col-check">suppr.<br>défaut</th>
+                    <th class="col-obs" style="text-align: left; padding-left: 5px;">Observations :</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td class="section-title" colspan="5">Suspension</td></tr>
+                <tr><td>État des lames de ressort</td><td class="col-check"><input type="checkbox" id="p2_su1_c"></td><td class="col-check"><input type="checkbox" id="p2_su1_i"></td><td class="col-check"><input type="checkbox" id="p2_su1_s"></td><td class="col-obs"><input type="text" id="p2_su1_o" class="obs-input-row"></td></tr>
+                <tr><td>Ressorts AV</td><td class="col-check"><input type="checkbox" id="p2_su2_c"></td><td class="col-check"><input type="checkbox" id="p2_su2_i"></td><td class="col-check"><input type="checkbox" id="p2_su2_s"></td><td class="col-obs"><input type="text" id="p2_su2_o" class="obs-input-row"></td></tr>
+                <tr><td>Ressorts AR</td><td class="col-check"><input type="checkbox" id="p2_su3_c"></td><td class="col-check"><input type="checkbox" id="p2_su3_i"></td><td class="col-check"><input type="checkbox" id="p2_su3_s"></td><td class="col-obs"><input type="text" id="p2_su3_o" class="obs-input-row"></td></tr>
+                <tr><td>Bride de ressorts</td><td class="col-check"><input type="checkbox" id="p2_su4_c"></td><td class="col-check"><input type="checkbox" id="p2_su4_i"></td><td class="col-check"><input type="checkbox" id="p2_su4_s"></td><td class="col-obs"><input type="text" id="p2_su4_o" class="obs-input-row"></td></tr>
+                <tr><td>Coussin suspension pneumatique</td><td class="col-check"><input type="checkbox" id="p2_su5_c"></td><td class="col-check"><input type="checkbox" id="p2_su5_i"></td><td class="col-check"><input type="checkbox" id="p2_su5_s"></td><td class="col-obs"><input type="text" id="p2_su5_o" class="obs-input-row"></td></tr>
+                <tr><td>Jeu sur tirants de pont ou essieux</td><td class="col-check"><input type="checkbox" id="p2_su6_c"></td><td class="col-check"><input type="checkbox" id="p2_su6_i"></td><td class="col-check"><input type="checkbox" id="p2_su6_s"></td><td class="col-obs"><input type="text" id="p2_su6_o" class="obs-input-row"></td></tr>
+                <tr><td>État des mains de ressorts et jumelles</td><td class="col-check"><input type="checkbox" id="p2_su7_c"></td><td class="col-check"><input type="checkbox" id="p2_su7_i"></td><td class="col-check"><input type="checkbox" id="p2_su7_s"></td><td class="col-obs"><input type="text" id="p2_su7_o" class="obs-input-row"></td></tr>
+                <tr><td>Bagues de barre stabilisatrice</td><td class="col-check"><input type="checkbox" id="p2_su8_c"></td><td class="col-check"><input type="checkbox" id="p2_su8_i"></td><td class="col-check"><input type="checkbox" id="p2_su8_s"></td><td class="col-obs"><input type="text" id="p2_su8_o" class="obs-input-row"></td></tr>
+                <tr><td>État d'usure et pression des pneumatiques</td><td class="col-check"><input type="checkbox" id="p2_su9_c"></td><td class="col-check"><input type="checkbox" id="p2_su9_i"></td><td class="col-check"><input type="checkbox" id="p2_su9_s"></td><td class="col-obs"><input type="text" id="p2_su9_o" class="obs-input-row"></td></tr>
+
+                <tr><td class="section-title" colspan="5">Châssis</td></tr>
+                <tr><td>Vérifier cassure ou fissures</td><td class="col-check"><input type="checkbox" id="p2_c1_c"></td><td class="col-check"><input type="checkbox" id="p2_c1_i"></td><td class="col-check"><input type="checkbox" id="p2_c1_s"></td><td class="col-obs"><input type="text" id="p2_c1_o" class="obs-input-row"></td></tr>
+                <tr><td>N° de châssis (visible, correspondant CG)</td><td class="col-check"><input type="checkbox" id="p2_c2_c"></td><td class="col-check"><input type="checkbox" id="p2_c2_i"></td><td class="col-check"><input type="checkbox" id="p2_c2_s"></td><td class="col-obs"><input type="text" id="p2_c2_o" class="obs-input-row"></td></tr>
+                <tr><td>Vérifier jeu de sellette</td><td class="col-check"><input type="checkbox" id="p2_c3_c"></td><td class="col-check"><input type="checkbox" id="p2_c3_i"></td><td class="col-check"><input type="checkbox" id="p2_c3_s"></td><td class="col-obs"><input type="text" id="p2_c3_o" class="obs-input-row"></td></tr>
+
+                <tr><td class="section-title" colspan="5">Transmission / État & Fixations</td></tr>
+                <tr><td>Jeu dans les cardans de transmission</td><td class="col-check"><input type="checkbox" id="p2_t1_c"></td><td class="col-check"><input type="checkbox" id="p2_t1_i"></td><td class="col-check"><input type="checkbox" id="p2_t1_s"></td><td class="col-obs"><input type="text" id="p2_t1_o" class="obs-input-row"></td></tr>
+                <tr><td>Moteur / Boite de vitesse / Ponts</td><td class="col-check"><input type="checkbox" id="p2_t2_c"></td><td class="col-check"><input type="checkbox" id="p2_t2_i"></td><td class="col-check"><input type="checkbox" id="p2_t2_s"></td><td class="col-obs"><input type="text" id="p2_t2_o" class="obs-input-row"></td></tr>
+                <tr><td>Faux châssis (boulons)</td><td class="col-check"><input type="checkbox" id="p2_t3_c"></td><td class="col-check"><input type="checkbox" id="p2_t3_i"></td><td class="col-check"><input type="checkbox" id="p2_t3_s"></td><td class="col-obs"><input type="text" id="p2_t3_o" class="obs-input-row"></td></tr>
+                <tr><td>Dispositifs d'attelage (états, jeux, fixations)</td><td class="col-check"><input type="checkbox" id="p2_t4_c"></td><td class="col-check"><input type="checkbox" id="p2_t4_i"></td><td class="col-check"><input type="checkbox" id="p2_t4_s"></td><td class="col-obs"><input type="text" id="p2_t4_o" class="obs-input-row"></td></tr>
+                <tr><td>Présence, état et fixation des portes</td><td class="col-check"><input type="checkbox" id="p2_t5_c"></td><td class="col-check"><input type="checkbox" id="p2_t5_i"></td><td class="col-check"><input type="checkbox" id="p2_t5_s"></td><td class="col-obs"><input type="text" id="p2_t5_o" class="obs-input-row"></td></tr>
+                <tr><td>Fixation équipements (caisse, grue, béquilles...)</td><td class="col-check"><input type="checkbox" id="p2_t6_c"></td><td class="col-check"><input type="checkbox" id="p2_t6_i"></td><td class="col-check"><input type="checkbox" id="p2_t6_s"></td><td class="col-obs"><input type="text" id="p2_t6_o" class="obs-input-row"></td></tr>
+                <tr><td>État/fonctionnement des commandes (pédales...)</td><td class="col-check"><input type="checkbox" id="p2_t7_c"></td><td class="col-check"><input type="checkbox" id="p2_t7_i"></td><td class="col-check"><input type="checkbox" id="p2_t7_s"></td><td class="col-obs"><input type="text" id="p2_t7_o" class="obs-input-row"></td></tr>
+                <tr><td>État/étanchéité composants de direction</td><td class="col-check"><input type="checkbox" id="p2_t8_c"></td><td class="col-check"><input type="checkbox" id="p2_t8_i"></td><td class="col-check"><input type="checkbox" id="p2_t8_s"></td><td class="col-obs"><input type="text" id="p2_t8_o" class="obs-input-row"></td></tr>
+                <tr><td>État du châssis, plancher, coffres, réservoirs</td><td class="col-check"><input type="checkbox" id="p2_t9_c"></td><td class="col-check"><input type="checkbox" id="p2_t9_i"></td><td class="col-check"><input type="checkbox" id="p2_t9_s"></td><td class="col-obs"><input type="text" id="p2_t9_o" class="obs-input-row"></td></tr>
+                <tr><td>Présence/fixation disques, tambours, freins</td><td class="col-check"><input type="checkbox" id="p2_t10_c"></td><td class="col-check"><input type="checkbox" id="p2_t10_i"></td><td class="col-check"><input type="checkbox" id="p2_t10_s"></td><td class="col-obs"><input type="text" id="p2_t10_o" class="obs-input-row"></td></tr>
+                <tr><td>Présence/cohérence chronotachygraphe</td><td class="col-check"><input type="checkbox" id="p2_t11_c"></td><td class="col-check"><input type="checkbox" id="p2_t11_i"></td><td class="col-check"><input type="checkbox" id="p2_t11_s"></td><td class="col-obs"><input type="text" id="p2_t11_o" class="obs-input-row"></td></tr>
+
+                <tr><td class="section-title" colspan="5">Fuites & Propreté</td></tr>
+                <tr><td>Fuites Huile</td><td class="col-check"><input type="checkbox" id="p2_l1_c"></td><td class="col-check"><input type="checkbox" id="p2_l1_i"></td><td class="col-check"><input type="checkbox" id="p2_l1_s"></td><td class="col-obs"><input type="text" id="p2_l1_o" class="obs-input-row"></td></tr>
+                <tr><td>Fuites Liquide de refroidissement</td><td class="col-check"><input type="checkbox" id="p2_l2_c"></td><td class="col-check"><input type="checkbox" id="p2_l2_i"></td><td class="col-check"><input type="checkbox" id="p2_l2_s"></td><td class="col-obs"><input type="text" id="p2_l2_o" class="obs-input-row"></td></tr>
+                <tr><td>Fuites Gazole (conduites et réservoirs)</td><td class="col-check"><input type="checkbox" id="p2_l3_c"></td><td class="col-check"><input type="checkbox" id="p2_l3_i"></td><td class="col-check"><input type="checkbox" id="p2_l3_s"></td><td class="col-obs"><input type="text" id="p2_l3_o" class="obs-input-row"></td></tr>
+                <tr><td>Propreté Extérieur / Intérieur</td><td class="col-check"><input type="checkbox" id="p2_l4_c"></td><td class="col-check"><input type="checkbox" id="p2_l4_i"></td><td class="col-check"><input type="checkbox" id="p2_l4_s"></td><td class="col-obs"><input type="text" id="p2_l4_o" class="obs-input-row"></td></tr>
+            </tbody>
+        </table>
+
+        <div class="footer">
+            <span>CL.04.04</span>
+            <span>MAN Truck and Bus France</span>
+            <span>p. 2/4</span>
+        </div>
+    </div>
+
+    <div class="page">
+        <table class="checklist">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th class="col-check">correct</th><th class="col-check">incorrect</th><th class="col-check">suppr.<br>défaut</th>
+                    <th class="col-obs" style="text-align: left; padding-left: 5px;">Observations :</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td class="section-title" colspan="5">Carrosserie</td></tr>
+                <tr><td>Ailes AV + AR</td><td class="col-check"><input type="checkbox" id="p3_c1_c"></td><td class="col-check"><input type="checkbox" id="p3_c1_i"></td><td class="col-check"><input type="checkbox" id="p3_c1_s"></td><td class="col-obs"><input type="text" id="p3_c1_o" class="obs-input-row"></td></tr>
+                <tr><td>Bavettes anti-pluie / Pare choc AV + AR</td><td class="col-check"><input type="checkbox" id="p3_c2_c"></td><td class="col-check"><input type="checkbox" id="p3_c2_i"></td><td class="col-check"><input type="checkbox" id="p3_c2_s"></td><td class="col-obs"><input type="text" id="p3_c2_o" class="obs-input-row"></td></tr>
+                <tr><td>Barre anti-encastrement</td><td class="col-check"><input type="checkbox" id="p3_c3_c"></td><td class="col-check"><input type="checkbox" id="p3_c3_i"></td><td class="col-check"><input type="checkbox" id="p3_c3_s"></td><td class="col-obs"><input type="text" id="p3_c3_o" class="obs-input-row"></td></tr>
+                <tr><td>Marchepied D et G</td><td class="col-check"><input type="checkbox" id="p3_c4_c"></td><td class="col-check"><input type="checkbox" id="p3_c4_i"></td><td class="col-check"><input type="checkbox" id="p3_c4_s"></td><td class="col-obs"><input type="text" id="p3_c4_o" class="obs-input-row"></td></tr>
+                <tr><td>Pare-brise (cassé ou fêlé)</td><td class="col-check"><input type="checkbox" id="p3_c5_c"></td><td class="col-check"><input type="checkbox" id="p3_c5_i"></td><td class="col-check"><input type="checkbox" id="p3_c5_s"></td><td class="col-obs"><input type="text" id="p3_c5_o" class="obs-input-row"></td></tr>
+                <tr><td>Rétroviseurs extérieurs et intérieur</td><td class="col-check"><input type="checkbox" id="p3_c6_c"></td><td class="col-check"><input type="checkbox" id="p3_c6_i"></td><td class="col-check"><input type="checkbox" id="p3_c6_s"></td><td class="col-obs"><input type="text" id="p3_c6_o" class="obs-input-row"></td></tr>
+                <tr><td>Fonctionnement essuie-glace et lave glace</td><td class="col-check"><input type="checkbox" id="p3_c7_c"></td><td class="col-check"><input type="checkbox" id="p3_c7_i"></td><td class="col-check"><input type="checkbox" id="p3_c7_s"></td><td class="col-obs"><input type="text" id="p3_c7_o" class="obs-input-row"></td></tr>
+                <tr><td>Ventilation de cabine</td><td class="col-check"><input type="checkbox" id="p3_c8_c"></td><td class="col-check"><input type="checkbox" id="p3_c8_i"></td><td class="col-check"><input type="checkbox" id="p3_c8_s"></td><td class="col-obs"><input type="text" id="p3_c8_o" class="obs-input-row"></td></tr>
+                <tr><td>Risque de perte d'élément / saillie</td><td class="col-check"><input type="checkbox" id="p3_c9_c"></td><td class="col-check"><input type="checkbox" id="p3_c9_i"></td><td class="col-check"><input type="checkbox" id="p3_c9_s"></td><td class="col-obs"><input type="text" id="p3_c9_o" class="obs-input-row"></td></tr>
+
+                <tr><td class="section-title" colspan="5">Échappement & Divers</td></tr>
+                <tr><td>Vérifier fonctionnement et silencieux</td><td class="col-check"><input type="checkbox" id="p3_e1_c"></td><td class="col-check"><input type="checkbox" id="p3_e1_i"></td><td class="col-check"><input type="checkbox" id="p3_e1_s"></td><td class="col-obs"><input type="text" id="p3_e1_o" class="obs-input-row"></td></tr>
+                <tr><td>Fixation conduite / Opacimétrie fumées</td><td class="col-check"><input type="checkbox" id="p3_e2_c"></td><td class="col-check"><input type="checkbox" id="p3_e2_i"></td><td class="col-check"><input type="checkbox" id="p3_e2_s"></td><td class="col-obs"><input type="text" id="p3_e2_o" class="obs-input-row"></td></tr>
+                <tr><td>Voyant moteur / anti-pollution</td><td class="col-check"><input type="checkbox" id="p3_e3_c"></td><td class="col-check"><input type="checkbox" id="p3_e3_i"></td><td class="col-check"><input type="checkbox" id="p3_e3_s"></td><td class="col-obs"><input type="text" id="p3_e3_o" class="obs-input-row"></td></tr>
+                <tr><td>Contrôlographe (Limite validation 2 ans)</td><td class="col-check"><input type="checkbox" id="p3_e4_c"></td><td class="col-check"><input type="checkbox" id="p3_e4_i"></td><td class="col-check"><input type="checkbox" id="p3_e4_s"></td><td class="col-obs"><input type="text" id="p3_e4_o" class="obs-input-row"></td></tr>
+                <tr><td>Plombage de la boite de vitesse</td><td class="col-check"><input type="checkbox" id="p3_e5_c"></td><td class="col-check"><input type="checkbox" id="p3_e5_i"></td><td class="col-check"><input type="checkbox" id="p3_e5_s"></td><td class="col-obs"><input type="text" id="p3_e5_o" class="obs-input-row"></td></tr>
+                <tr><td>Essai sur route + disque tachy</td><td class="col-check"><input type="checkbox" id="p3_e6_c"></td><td class="col-check"><input type="checkbox" id="p3_e6_i"></td><td class="col-check"><input type="checkbox" id="p3_e6_s"></td><td class="col-obs"><input type="text" id="p3_e6_o" class="obs-input-row"></td></tr>
+                <tr><td>Documents (CG, RTI, TMD, Cuves air)</td><td class="col-check"><input type="checkbox" id="p3_e7_c"></td><td class="col-check"><input type="checkbox" id="p3_e7_i"></td><td class="col-check"><input type="checkbox" id="p3_e7_s"></td><td class="col-obs"><input type="text" id="p3_e7_o" class="obs-input-row"></td></tr>
+            </tbody>
+        </table>
+
+        <div style="margin-top: 15px;">
+            <div class="section-title">Remarques globales :</div>
+            <textarea id="p3_remarques" class="input-blue" style="height: 100px; resize: none;"></textarea>
+        </div>
+
+        <div class="signature-block">
+            <div style="width: 45%;">
+                <div style="font-weight: bold; margin-bottom: 5px;">DATE DU CONTROLE</div>
+                <input type="date" id="p3_date" class="input-blue">
+            </div>
+            <div style="width: 45%;">
+                <div style="font-weight: bold; margin-bottom: 5px;">SIGNATURE</div>
+                <div style="height: 60px; border: 1px dotted #999; background-color: #f9f9f9;"></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span>CL.04.04</span>
+            <span>MAN Truck and Bus France</span>
+            <span>p. 3/4</span>
+        </div>
+    </div>
+
+    <div class="page">
+        <div class="title" style="text-align: center; margin-bottom: 20px;">ANNEXES TECHNIQUES</div>
+        
+        <div class="annexe-title">ANNEXE 1 : Rabattement des faisceaux lumineux des feux de croisement et de brouillard</div>
+        <table class="annexe-table">
+            <thead>
+                <tr>
+                    <th>Hauteur de la partie inférieure du réflecteur par rapport au sol</th>
+                    <th>Plage acceptable de valeurs de rabattement de la ligne de coupure</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Inférieure à 0,8 (exclue)</td><td>Entre les repères - 0,5% (inclus)</td></tr>
+                <tr><td>Comprise entre 0,8 (incluse) et 1,0 (incluse)</td><td>Entre les repères -0,5% (inclus) et -3% (inclus)</td></tr>
+                <tr><td>Comprise entre 1,0 (exclue) et 1,2 (incluse)</td><td>Entre les repères -1% (inclus) et -3% (inclus)</td></tr>
+                <tr><td>Supérieure à 1,2 (exclue) - N3G uniquement</td><td>Entre les repères -1,5 % (inclus) et -3,5% (inclus)</td></tr>
+            </tbody>
+        </table>
+
+        <div class="annexe-title">ANNEXE 2 : Rabattement des Faisceaux lumineux des feux de brouillard avant</div>
+        <table class="annexe-table">
+            <thead>
+                <tr><th>Plage de valeurs de rabattement de la ligne de coupure</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Comprise entre -1,0% (inclus) et -3,5% (inclus)</td></tr>
+            </tbody>
+        </table>
+
+        <div class="annexe-title">ANNEXE 3 : Efficacité minimale de freinage au banc</div>
+        <table class="annexe-table">
+            <thead>
+                <tr>
+                    <th>Catégorie du véhicule</th>
+                    <th>Mise en circulation</th>
+                    <th>Frein principal</th>
+                    <th>Frein de secours</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td rowspan="2">Véhicules de catégorie M1</td><td>Jusqu'au 31/12/11</td><td>50%</td><td>25%</td></tr>
+                <tr><td>A compter du 01/01/12</td><td>58%</td><td>29%</td></tr>
+                <tr><td>Véhicules de transport en commun de personnes (M2/M3)</td><td>Toutes dates</td><td>50% (48% sans ABR)</td><td>25% (24% sans ABR)</td></tr>
+                <tr><td rowspan="2">Véhicules à moteur de transport marchandises (N1)</td><td>Jusqu'au 30/09/89</td><td>45%</td><td>23%</td></tr>
+                <tr><td>A compter du 01/10/89</td><td>50%</td><td>25%</td></tr>
+                <tr><td rowspan="3">Véhicules à moteur de transport marchandises (N2/N3)</td><td>Jusqu'au 29/09/89</td><td>43%</td><td>22%</td></tr>
+                <tr><td>A compter du 01/10/89 au 31/12/11</td><td>45%</td><td>23%</td></tr>
+                <tr><td>A compter du 01/01/12</td><td>50%</td><td>25%</td></tr>
+            </tbody>
+        </table>
+        
+        <ul style="font-size: 8.5pt; margin-top: 10px;">
+            <li>L'efficacité du frein de stationnement est considérée comme insuffisante lorsqu'elle est strictement inf. à 18%.</li>
+            <li>Le déséquilibre doit être inférieur à 20% pour le frein principal, inférieur à 30% pour le frein de secours.</li>
+        </ul>
+
+        <div class="footer">
+            <span>CL.04.04</span>
+            <span>MAN Truck and Bus France</span>
+            <span>p. 4/4</span>
+        </div>
+    </div>
+
+    <script>
+        const allInputs = document.querySelectorAll('input, textarea');
+        
+        // 1. Chargement au démarrage
+        allInputs.forEach(input => {
+            if (!input.id) return;
+            const savedData = localStorage.getItem('man-ct-v3-' + input.id);
+            if (savedData !== null) {
+                if (input.type === 'checkbox') {
+                    input.checked = savedData === 'true';
+                } else {
+                    input.value = savedData;
+                }
+            }
+            
+            // 2. Écouteur pour sauvegarder chaque modification instantanément
+            input.addEventListener('input', () => {
+                const valueToSave = input.type === 'checkbox' ? input.checked : input.value;
+                localStorage.setItem('man-ct-v3-' + input.id, valueToSave);
+            });
+        });
+
+        // 3. Fonction pour tout effacer (Nouveau rapport)
+        function resetForm() {
+            if(confirm("Veux-tu vraiment réinitialiser toutes les données pour commencer un nouveau rapport ?")) {
+                allInputs.forEach(input => {
+                    if (input.type === 'checkbox') {
+                        input.checked = false;
+                    } else {
+                        input.value = '';
+                    }
+                    localStorage.removeItem('man-ct-v3-' + input.id);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
